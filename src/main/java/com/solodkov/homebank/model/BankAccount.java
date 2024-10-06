@@ -6,7 +6,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 import static lombok.AccessLevel.*;
@@ -29,21 +28,14 @@ public class BankAccount {
     @Column(name = "account_id")
     UUID accountId;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     User user;
-
-    @NotNull
-    @Column(name = "pin")
-    String pin;
 
     @Column(name = "balance")
     BigDecimal balance;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JoinColumn(name = "currency_id", referencedColumnName = "id")
     Currency currency;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "bankAccount")
-    List<History> histories;
 }

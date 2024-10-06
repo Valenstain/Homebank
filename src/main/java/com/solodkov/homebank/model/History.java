@@ -24,7 +24,7 @@ public class History {
     @Column(name = "id")
     int id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "bank_account_id", referencedColumnName = "id")
     BankAccount bankAccount;
 

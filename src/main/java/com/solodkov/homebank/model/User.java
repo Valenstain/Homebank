@@ -27,6 +27,10 @@ public class User {
     @Column(name = "name", nullable = false)
     String name;
 
+    @NotNull
+    @Column(name = "pin")
+    String pin;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
     List<BankAccount> bankAccount;
 }
