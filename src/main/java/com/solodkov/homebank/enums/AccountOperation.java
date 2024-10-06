@@ -1,4 +1,4 @@
-package com.solodkov.Homebank.enums;
+package com.solodkov.homebank.enums;
 
 public enum AccountOperation {
     ADD,
