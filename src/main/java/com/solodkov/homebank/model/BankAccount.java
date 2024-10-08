@@ -16,26 +16,24 @@ import static lombok.AccessLevel.*;
 @Setter
 @FieldDefaults(level = PRIVATE)
 @Entity
+@ToString
 @Table(name = "bank_account")
 public class BankAccount {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    int id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id")
+  int id;
 
-    @NotNull
-    @Column(name = "account_id")
-    UUID accountId;
+  @NotNull
+  @Column(name = "account_id")
+  UUID accountId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    User user;
+  @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH,
+      CascadeType.DETACH})
+  @JoinColumn(name = "user_id", referencedColumnName = "id")
+  User user;
 
-    @Column(name = "balance")
-    BigDecimal balance;
-
-    @OneToOne
-    @JoinColumn(name = "currency_id", referencedColumnName = "id")
-    Currency currency;
+  @Column(name = "balance")
+  BigDecimal balance;
 }

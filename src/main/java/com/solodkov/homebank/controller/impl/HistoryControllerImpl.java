@@ -2,54 +2,41 @@ package com.solodkov.homebank.controller.impl;
 
 import com.solodkov.homebank.controller.HistoryController;
 import com.solodkov.homebank.dto.HistoryDto;
+import com.solodkov.homebank.service.HistoryService;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-/**
- * Контроллер предоставляющий
- * исторические данные по операциям
- * на счете
- */
+import static lombok.AccessLevel.*;
+
+@RequiredArgsConstructor
+@FieldDefaults(level = PRIVATE)
 @RestController("/homebank")
 public class HistoryControllerImpl implements HistoryController {
 
-    /**
-     * Получение истории транзакций
-     *
-     * @param accountId идентификационный номер счета
-     * @param pin       пин код
-     * @return возвращает ответ в виде JSON
-     */
-    @Override
-    @GetMapping("/history/{accountId}")
-    public ResponseEntity<List<HistoryDto>> getHistory(
-            @PathVariable("accountId") UUID accountId,
-            @RequestParam("pin") String pin) {
+  final HistoryService historyService;
 
-        List<HistoryDto> historyDtoList = new ArrayList<>();
+  @Override
+  @GetMapping("/history")
+  public ResponseEntity<List<HistoryDto>> getHistory(
+      @RequestParam("username") String username,
+      @RequestParam("pin") String pin) {
 
-        HistoryDto historyDto = new HistoryDto(
-                accountId,
-                "Solodkov",
-                "WITHDRAW",
-                BigDecimal.valueOf(12.10),
-                "USD");
+    List<HistoryDto> historyDtoList = historyService.getHistory(
+        username,
+        pin
+    );
 
-        historyDtoList.add(historyDto);
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(historyDtoList);
-    }
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(historyDtoList);
+  }
 }

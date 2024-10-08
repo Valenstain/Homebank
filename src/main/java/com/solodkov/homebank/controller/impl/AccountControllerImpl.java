@@ -4,133 +4,78 @@ import com.solodkov.homebank.controller.AccountController;
 import com.solodkov.homebank.dto.BankAccountDto;
 import com.solodkov.homebank.dto.DetailsBankAccountDto;
 import com.solodkov.homebank.dto.TransferDto;
+import com.solodkov.homebank.dto.UserBankAccountsDto;
+import com.solodkov.homebank.service.AccountService;
 import jakarta.validation.Valid;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import static lombok.AccessLevel.*;
 
-/**
- * Контроллер по работе со счетами
- */
 @Validated
-@RestController("/homebank/account")
+@RequiredArgsConstructor
+@FieldDefaults(level = PRIVATE)
+@RestController("/homebank/bank-accounts")
 public class AccountControllerImpl implements AccountController {
 
-    /**
-     * "Получение списка всех счетов
-     * закрепленных за пользователем
-     *
-     * @param username имя пользователя
-     * @param pin      пин код
-     * @return ответ в виде JSON
-     */
-    @Override
-    @GetMapping("/details/all/{username}")
-    public ResponseEntity<List<DetailsBankAccountDto>> getBankAccounts(
-            @PathVariable("username") String username,
-            @RequestParam("pin") String pin) {
+  final AccountService accountService;
 
-        List<DetailsBankAccountDto> bankAccounts = new ArrayList<>();
+  @Override
+  @GetMapping("/all")
+  public ResponseEntity<List<UserBankAccountsDto>> getAllBankAccounts() {
 
-        DetailsBankAccountDto accountDto = new DetailsBankAccountDto(
-                UUID.randomUUID(),
-                "Solodkov",
-                BigDecimal.valueOf(0.0),
-                "usd"
-        );
+    List<UserBankAccountsDto> bankAccounts = accountService.getAllBankAccounts();
 
-        bankAccounts.add(accountDto);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(bankAccounts);
+  }
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(bankAccounts);
-    }
+  @Override
+  @GetMapping("/{username}")
+  public ResponseEntity<UserBankAccountsDto> getUserBankAccounts(
+      @PathVariable("username") String username,
+      @RequestParam("pin") String pin) {
 
-    /**
-     * По запросу предоставляет подробную
-     * информацию о счете
-     *
-     * @param accountId идентификатор счета
-     * @param pin       пин код
-     * @return возвращает ответ в виде JSON
-     */
-    @Override
-    @GetMapping("/details/{accountId}")
-    public ResponseEntity<DetailsBankAccountDto> detailsAccount(
-            @PathVariable("accountId") UUID accountId,
-            @RequestParam("pin") String pin) {
+    UserBankAccountsDto userBankAccountsDto = accountService.getUserBankAccounts(username, pin);
 
-        DetailsBankAccountDto accountDto = new DetailsBankAccountDto(
-                UUID.randomUUID(),
-                "Solodkov",
-                BigDecimal.valueOf(0.0),
-                "usd"
-        );
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(userBankAccountsDto);
+  }
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(accountDto);
-    }
+  @Override
+  @PostMapping("/add")
+  public ResponseEntity<DetailsBankAccountDto> addAccount(
+      @Valid @RequestBody BankAccountDto bankAccountDto) {
 
-    /**
-     * Создание нового счета
-     *
-     * @param bankAccountDto данные необходимые для создания счета
-     * @param pin            пин код
-     * @return возвращает ответ в виде JSON
-     */
-    @Override
-    @PostMapping("/add")
-    public ResponseEntity<DetailsBankAccountDto> addAccount(
-            @Valid @RequestBody BankAccountDto bankAccountDto,
-            @RequestParam("pin") String pin) {
+    DetailsBankAccountDto detailsBankAccountDto = accountService.addBankAccount(bankAccountDto);
 
-        DetailsBankAccountDto accountDto = new DetailsBankAccountDto(
-                UUID.randomUUID(),
-                "Solodkov",
-                BigDecimal.valueOf(0.0),
-                "usd"
-        );
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(detailsBankAccountDto);
+  }
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(accountDto);
-    }
+  @Override
+  @PatchMapping("/transfer")
+  public ResponseEntity<DetailsBankAccountDto> transfer(
+      @Valid @RequestBody TransferDto transferDto) {
 
-    /**
-     * Операции со счетами:
-     * переводы, вывод, добавление
-     *
-     * @param transferDto данные необходимые для транзакций
-     * @param pin         пин код
-     * @return возвращает ответ в виде JSON
-     */
-    @Override
-    @PatchMapping("/transfer")
-    public ResponseEntity<DetailsBankAccountDto> transfer(
-            @Valid @RequestBody TransferDto transferDto,
-            @RequestParam("pin") String pin) {
+    DetailsBankAccountDto accountDto = accountService.handleTransfer(transferDto);
 
-        DetailsBankAccountDto accountDto = new DetailsBankAccountDto(
-                UUID.randomUUID(),
-                "Solodkov",
-                BigDecimal.valueOf(0.0),
-                "usd"
-        );
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(accountDto);
+  }
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(accountDto);
-    }
 }

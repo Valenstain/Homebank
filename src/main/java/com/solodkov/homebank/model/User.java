@@ -18,19 +18,19 @@ import static lombok.AccessLevel.*;
 @Table(name = "users")
 public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    int id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id", nullable = false)
+  int id;
 
-    @NotNull
-    @Column(name = "name", nullable = false)
-    String name;
+  @NotNull
+  @Column(name = "name", nullable = false)
+  String name;
 
-    @NotNull
-    @Column(name = "pin")
-    String pin;
+  @NotNull
+  @Column(name = "pin")
+  String pin;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
-    List<BankAccount> bankAccount;
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+  List<BankAccount> bankAccounts;
 }
